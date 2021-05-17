@@ -13,6 +13,7 @@ d3.json("data/samples.json").then((samples)  =>{
     var selected_name = names[0];
     createBarchart(selected_name);
     createBubblechart(selected_name);
+    createGaugechart(selected_name);
 });
 
 //first function for bar chart 
@@ -61,10 +62,17 @@ function createBubblechart(sample_id) {
 
         var yticks = sample_values
 
+        var x = otu_ids
+        var y = yticks
+
         var trace2 ={
-            x: otu_ids,
-            y: yticks,
-            type: "bubble"
+            x: x,
+            y: y,
+            mode: "markers",
+            marker: {
+                size: y,
+                color: x
+            }
         };
 
         var layout = {
@@ -80,9 +88,40 @@ function createBubblechart(sample_id) {
     console.log(`calling create bubble chart with sample id ${sample_id}`)
 };
 
+//create gauge chart
+
+function createGaugechart(sample_id) {
+    d3.json("data/samples.json").then((samples_data) => {
+        var samples = samples_data.metadata;
+        var samples_array = samples.filter(obj => obj.id == sample_id);
+        var results = samples_array[0];
+
+        var wash_freq = results.wfreq;
+        // var otu_labels = results.otu_labels;
+        // var sample_values = results.sample_values;
+        var trace3 ={
+            domain: { x: [0,1], y:[0,1]},
+            value: wash_freq,
+            title: { text: "Belly Button Washing Frequency"},
+            type: "indicator",
+            mode: "gauge+number"
+        };
+
+        var layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
+
+        var gauge_data = [trace3];
+        Plotly.newPlot("gauge", gauge_data, layout );
+
+
+
+    });
+    console.log(`calling create gauge cgart with sample id ${samples_data}`)
+};
+
 //create option change fucntion matching from HTML 
 
 function optionChanged(new_id){
     createBarchart(new_id);
     createBubblechart(new_id);
+    createGaugechart(newid);
 };
